@@ -7,9 +7,9 @@ namespace AS.Blog.Core.Service
 {
     public class BlogService : IBlogService
     {
-        private readonly BloggingContext _context;
+        private readonly BlogContext _context;
 
-        public BlogService(BloggingContext context)
+        public BlogService(BlogContext context)
         {
             _context = context;
         }

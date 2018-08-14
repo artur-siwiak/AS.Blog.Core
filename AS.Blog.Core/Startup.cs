@@ -28,7 +28,7 @@ namespace AS.Blog.Core
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            services.AddDbContext<BloggingContext>(options =>
+            services.AddDbContext<BlogContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services
@@ -40,15 +40,17 @@ namespace AS.Blog.Core
                 })
                 .AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN")
                 .AddTransient<IPasswordHasher<User>, CustomPasswordHasher>()
-                .AddTransient<ILookupNormalizer, CustomLookupNormalizer>();
+                .AddTransient<ILookupNormalizer, CustomLookupNormalizer>()
+                .AddTransient<IPasswordValidator<User>, CustomPasswordValidator>()
+                ;
 
             // Add identity types
             services
                 .AddIdentity<User, Role>()
                 .AddRoleStore<CustomRoleStore>()
                 .AddUserStore<CustomUserStore>()
-                //.AddRoleValidator<CustomRoleStore>()
-                //.AddUserStore<CustomUserStore>()
+                .AddRoleValidator<CustomRoleStore>()
+                .AddUserStore<CustomUserStore>()
                 .AddDefaultTokenProviders();
 
             services
@@ -56,10 +58,16 @@ namespace AS.Blog.Core
                 .AddRouting(opt => opt.LowercaseUrls = true)
                 .AddScoped<IUserStore<User>, CustomUserStore>()
                 .AddScoped<IRoleStore<Role>, CustomRoleStore>()
-                .AddScoped<IUserRoleStore<User>, CustomUserStore>();
+                .AddScoped<IUserRoleStore<User>, CustomUserStore>()
+                .AddScoped<IRoleService, RoleService>()
+                .AddScoped<IUserService, UserService>()
+                .AddScoped<IUserRolesService, UserRolesService>()
+
+                ;
 
             services
-                .AddRouting();
+                .AddRouting()
+                .LoadPolicies();
 
             services
                 .AddTransient<IBlogService, BlogService>()
@@ -84,7 +92,7 @@ namespace AS.Blog.Core
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-
+            app.UseAuthentication();
             app.UseStatusCodePagesWithRedirects("/error/{0}");
 
             app.UseMvc(routes =>

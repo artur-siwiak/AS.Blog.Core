@@ -98,7 +98,7 @@ namespace AS.Blog.Core.Store
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            return _service.GetUserId(user.Email);
+            return Task.FromResult(user.UserId.ToString());
         }
 
         public Task<string> GetUserNameAsync(User user, CancellationToken cancellationToken = default)

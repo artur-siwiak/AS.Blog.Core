@@ -1,48 +1,45 @@
 ﻿using AS.Blog.Core.DB;
-using Microsoft.AspNetCore.Identity;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace AS.Blog.Core.Service
 {
     public class RoleService : IRoleService
     {
-        private readonly BloggingContext _context;
+        private readonly BlogContext _db;
 
-        public RoleService(BloggingContext context)
+        public RoleService(BlogContext db)
         {
-            _context = context;
+            _db = db;
         }
 
         public async Task<bool> AddRole(Role role)
         {
-            var tmpRole = _context.Roles.Add(role);
-            await _context.SaveChangesAsync().ConfigureAwait(false);
+            var tmpRole = _db.Roles.Add(role);
+            await _db.SaveChangesAsync().ConfigureAwait(false);
 
-            return tmpRole.Entity.Id > 0;
+            return tmpRole.Entity.RoleId > 0;
         }
 
         public async Task<bool> DeleteRole(int id)
         {
-            var tmpRole = _context.Roles.Where(x => x.Id == id).FirstOrDefault();
+            var tmpRole = _db.Roles.Where(x => x.RoleId == id).FirstOrDefault();
 
             if (tmpRole == null)
             {
                 return false;
             }
 
-            var result = _context.Roles.Remove(tmpRole);
-            await _context.SaveChangesAsync().ConfigureAwait(false);
+            var result = _db.Roles.Remove(tmpRole);
+            await _db.SaveChangesAsync().ConfigureAwait(false);
 
             return result.State == Microsoft.EntityFrameworkCore.EntityState.Deleted;
         }
 
         public Task<Role> GetRole(int role)
         {
-            var result = _context.Roles.Where(x => x.Id == role).FirstOrDefault();
+            var result = _db.Roles.Where(x => x.RoleId == role).FirstOrDefault();
 
             if (result == null)
             {
@@ -54,7 +51,7 @@ namespace AS.Blog.Core.Service
 
         public Task<Role> GetRole(string role)
         {
-            var result = _context.Roles.Where(x => x.Name == role).FirstOrDefault();
+            var result = _db.Roles.Where(x => x.Name == role).FirstOrDefault();
 
             if (result == null)
             {
@@ -66,8 +63,8 @@ namespace AS.Blog.Core.Service
 
         public async Task<bool> UpdateRole(Role role)
         {
-            var result = _context.Update(role);
-            await _context.SaveChangesAsync().ConfigureAwait(false);
+            var result = _db.Update(role);
+            await _db.SaveChangesAsync().ConfigureAwait(false);
 
             return true;
         }

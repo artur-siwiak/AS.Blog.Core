@@ -8,9 +8,9 @@ namespace AS.Blog.Core.Service
 {
     public class UserService : IUserService
     {
-        private readonly BloggingContext _context;
+        private readonly BlogContext _context;
 
-        public UserService(BloggingContext context)
+        public UserService(BlogContext context)
         {
             _context = context;
         }
@@ -26,7 +26,7 @@ namespace AS.Blog.Core.Service
             }
 
             _context.UserRoles.Add(
-                new UserRole { User = user, Role = role });
+                new UserRoles { User = user, Role = role });
 
             await _context.SaveChangesAsync().ConfigureAwait(false);
         }
@@ -80,13 +80,13 @@ namespace AS.Blog.Core.Service
         {
             return Task.FromResult(
                 _context.Users.
-                Where(x => x.Email == userId)
+                Where(x => x.UserId.ToString() == userId)
                 .First());
         }
 
         public Task<User> FindUserByName(string email)
         {
-            return Task.FromResult(_context.Users.Where(x => x.Email == email).First());
+            return Task.FromResult(_context.Users.Where(x => x.Email == email).FirstOrDefault());
         }
 
         public Task<bool> GetRoleForUser(string email, string roleName)
@@ -100,10 +100,12 @@ namespace AS.Blog.Core.Service
 
         public Task<List<string>> GetRolesForUser(string email)
         {
-            return Task.FromResult(_context.Users.Where(x => x.Email == email)
+            var a = _context.Users.Where(x => x.Email == email)
                 .SelectMany(x => x.Roles)
                 .Select(x => x.Role.Name)
-                .ToList());
+                .ToList();
+
+            return Task.FromResult(a);
         }
 
         public Task<string> GetUserId(object name)

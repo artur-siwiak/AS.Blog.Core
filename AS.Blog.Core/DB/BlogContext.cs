@@ -6,20 +6,18 @@ using System.Threading.Tasks;
 
 namespace AS.Blog.Core.DB
 {
-    public class BloggingContext : DbContext
+    public class BlogContext : DbContext
     {
-        private readonly ILogger<BloggingContext> _log;
+        private readonly ILogger<BlogContext> _log;
 
         public DbSet<Post> Posts { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Comment> Comments { get; set; }
 
-        public DbSet<UserRole> UserRoles { get; set; }
+        public DbSet<UserRoles> UserRoles { get; set; }
         public DbSet<Role> Roles { get; set; }
 
-        //public DbSet<Policy> Policies { get; set; }
-
-        public BloggingContext(DbContextOptions<BloggingContext> options, ILogger<BloggingContext> log)
+        public BlogContext(DbContextOptions<BlogContext> options, ILogger<BlogContext> log)
             : base(options)
         {
             _log = log;
@@ -27,23 +25,31 @@ namespace AS.Blog.Core.DB
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            void Seed()
+            {
+                var id = 1;
+
+                foreach (var role in Security.Policies.Roles)
+                {
+                    modelBuilder.Entity<Role>().HasData(new Role { RoleId = id, Name = role });
+
+                    id++;
+                }
+            }
+
             modelBuilder.Entity<Post>()
                 .HasIndex(p => p.Url)
                 .IsUnique(true);
 
-            //modelBuilder.Entity<Policy>()
-            //    .HasIndex(p => p.Name)
-            //    .IsUnique();
-
-            modelBuilder.Entity<UserRole>()
+            modelBuilder.Entity<UserRoles>()
                 .HasKey(bc => new { bc.RoleId, bc.UserId });
 
-            modelBuilder.Entity<UserRole>()
+            modelBuilder.Entity<UserRoles>()
                 .HasOne(bc => bc.User)
                 .WithMany(b => b.Roles)
                 .HasForeignKey(bc => bc.UserId);
 
-            modelBuilder.Entity<UserRole>()
+            modelBuilder.Entity<UserRoles>()
                 .HasOne(bc => bc.Role)
                 .WithMany(c => c.Users)
                 .HasForeignKey(bc => bc.RoleId);
@@ -51,6 +57,8 @@ namespace AS.Blog.Core.DB
             modelBuilder.Entity<Role>()
                 .HasIndex(p => p.Name)
                 .IsUnique();
+
+            Seed();
         }
 
         public override int SaveChanges()

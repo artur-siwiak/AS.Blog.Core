@@ -10,9 +10,7 @@ namespace AS.Blog.Core.DB
         public bool Active { get; set; }
         public string Password { get; set; }
         public string Salt { get; set; }
-        public string Hash { get; set; }
 
-        //public Policy Policy { get; set; }
-        public List<UserRole> Roles { get; set; }
+        public List<UserRoles> Roles { get; set; }
     }
 }

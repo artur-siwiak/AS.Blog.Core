@@ -62,7 +62,7 @@ namespace AS.Blog.Core.Store
 
         public async Task<IdentityResult> DeleteAsync(Role role, CancellationToken cancellationToken)
         {
-            var deleted = await _db.DeleteRole(role.Id).ConfigureAwait(false);
+            var deleted = await _db.DeleteRole(role.RoleId).ConfigureAwait(false);
 
             return deleted
                 ? IdentityResult.Success
@@ -90,7 +90,7 @@ namespace AS.Blog.Core.Store
 
         public Task<string> GetRoleIdAsync(Role role, CancellationToken cancellationToken)
         {
-            return Task.FromResult(role.Id.ToString());
+            return Task.FromResult(role.RoleId.ToString());
         }
 
         public Task<string> GetRoleNameAsync(Role role, CancellationToken cancellationToken)
