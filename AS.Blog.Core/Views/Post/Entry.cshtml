@@ -1,0 +1,10 @@
+﻿@using AS.Blog.Core.DB;
+@model Post
+@{
+    ViewData["Title"] = @Model.Subject;
+}
+
+<h2>@Model.Subject</h2>
+<h5>Publish date: @Model.PublishDate.ToLocalTime().ToShortDateString() @Model.PublishDate.ToLocalTime().ToShortTimeString()</h5>
+<hr />
+@Html.Raw(Model.Content)

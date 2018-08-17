@@ -17,13 +17,18 @@
                 <span asp-validation-for="Subject" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="PublishDate"></label>
+                <input asp-for="PublishDate" class="form-control" />
+                <span asp-validation-for="PublishDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="Url"></label>
                 <input asp-for="Url" class="form-control" />
                 <span asp-validation-for="Url" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Content"></label>
-                <input asp-for="Content" class="form-control" />
+                <textarea asp-for="Content" id="editable" class="form-control"></textarea>
                 <span asp-validation-for="Content" class="text-danger"></span>
             </div>
             <div class="form-group">

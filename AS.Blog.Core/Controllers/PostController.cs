@@ -8,6 +8,7 @@ using LanguageExt;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -48,7 +49,7 @@ namespace AS.Blog.Core.Controllers
 
         public IActionResult New()
         {
-            return View();
+            return View(new PostModel { PublishDate = DateTime.Now });
         }
 
         [HttpPost]
@@ -63,6 +64,7 @@ namespace AS.Blog.Core.Controllers
                 {
                     Content = model.Content,
                     CreateDate = Clock.Now.DateTimeUtc,
+                    PublishDate = model.PublishDate.ToUniversalTime(),
                     Deleted = false,
                     Subject = model.Subject,
                     Url = model.Url.Pretty(),

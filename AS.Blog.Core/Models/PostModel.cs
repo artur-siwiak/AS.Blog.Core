@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace AS.Blog.Core.Models
 {
@@ -7,6 +8,11 @@ namespace AS.Blog.Core.Models
         [Required]
         [Display(Name = "Subject", Description = "Subject of new post")]
         public string Subject { get; set; }
+
+        [Required]
+        [Display(Name = "Publish date")]
+        [DataType(DataType.DateTime)]
+        public DateTime PublishDate { get; set; }
 
         [Required]
         [DataType(DataType.MultilineText)]
