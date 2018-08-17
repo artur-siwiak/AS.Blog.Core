@@ -102,11 +102,6 @@ namespace AS.Blog.Core
                     template: "{controller=Home}/{action=Index}/{id?}");
 
                 routes.MapRoute(
-                    name: "post_route",
-                    template: "Post/{*postUrl}",
-                    defaults: new { controller = "Post", Action = "Index" });
-
-                routes.MapRoute(
                     name: "error_route",
                     template: "Error/{*errorCode}",
                     defaults: new { controller = "Error", Action = "Index" });

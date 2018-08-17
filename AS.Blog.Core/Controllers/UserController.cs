@@ -38,7 +38,7 @@ namespace AS.Blog.Core.Controllers
                 return View(model);
             }
 
-            var user = await _userService.FindUserByName(model.Email);
+            var user = await _userService.FindUserByName(model.Email).ConfigureAwait(false);
 
             if (user == null)
             {

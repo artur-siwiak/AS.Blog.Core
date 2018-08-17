@@ -17,6 +17,9 @@ namespace AS.Blog.Core.DB
         public DbSet<UserRoles> UserRoles { get; set; }
         public DbSet<Role> Roles { get; set; }
 
+        public DbSet<Tag> Tags { get; set; }
+        public DbSet<PostTags> PostTags { get; set; }
+
         public BlogContext(DbContextOptions<BlogContext> options, ILogger<BlogContext> log)
             : base(options)
         {
@@ -54,7 +57,34 @@ namespace AS.Blog.Core.DB
                 .WithMany(c => c.Users)
                 .HasForeignKey(bc => bc.RoleId);
 
+            modelBuilder.Entity<PostTags>()
+                .HasKey(bc => new { bc.PostId, bc.TagId });
+
+            modelBuilder.Entity<UserRoles>()
+                .HasOne(bc => bc.User)
+                .WithMany(b => b.Roles)
+                .HasForeignKey(bc => bc.UserId);
+
+            modelBuilder.Entity<PostTags>()
+                .HasOne(bc => bc.Post)
+                .WithMany(b => b.Tags)
+                .HasForeignKey(bc => bc.TagId);
+
+            modelBuilder.Entity<UserRoles>()
+                .HasOne(bc => bc.Role)
+                .WithMany(c => c.Users)
+                .HasForeignKey(bc => bc.RoleId);
+
+            modelBuilder.Entity<PostTags>()
+                .HasOne(bc => bc.Tag)
+                .WithMany(c => c.Posts)
+                .HasForeignKey(bc => bc.PostId);
+
             modelBuilder.Entity<Role>()
+                .HasIndex(p => p.Name)
+                .IsUnique();
+
+            modelBuilder.Entity<Tag>()
                 .HasIndex(p => p.Name)
                 .IsUnique();
 

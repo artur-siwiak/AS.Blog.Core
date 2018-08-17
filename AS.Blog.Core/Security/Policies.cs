@@ -1,15 +1,18 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AS.Blog.Core.Security
 {
     public static class Policies
     {
-        public static List<string> Roles => new List<string>()
+        public static List<string> Roles { get; }
+
+        static Policies()
         {
-            "Administrator",
-            "User"
-        };
+            Roles = Enum.GetNames(typeof(PoliciesEnum)).ToList();
+        }
 
         public static IServiceCollection LoadPolicies(this IServiceCollection services)
         {

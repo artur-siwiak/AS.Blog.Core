@@ -1,16 +1,20 @@
 ﻿using AS.Blog.Core.DB;
+using AS.Blog.Core.Helpers;
 using AS.Blog.Core.Models;
+using AS.Blog.Core.Security;
 using AS.Blog.Core.Service;
 using AS.Utils;
 using LanguageExt;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AS.Blog.Core.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Post")]
     public class PostController : Controller
     {
         private readonly ILogger<PostController> _log;
@@ -26,14 +30,25 @@ namespace AS.Blog.Core.Controllers
             _user = user;
         }
 
-        [AllowAnonymous]
-        public async Task<IActionResult> Index(string postUrl)
+        public IActionResult Index()
         {
-            var post = await GetPost(postUrl).ConfigureAwait(false);
+            return RedirectToActionPermanent(nameof(HomeController.Index), "Home");
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> Entry(string id)
+        {
+            var post = await GetPost(id).ConfigureAwait(false);
 
             return
                 post.Right(p => (IActionResult)View(p))
                 .Left(x => x);
+        }
+
+        public IActionResult New()
+        {
+            return View();
         }
 
         [HttpPost]
@@ -50,9 +65,13 @@ namespace AS.Blog.Core.Controllers
                     CreateDate = Clock.Now.DateTimeUtc,
                     Deleted = false,
                     Subject = model.Subject,
-                    Url = model.Url,
+                    Url = model.Url.Pretty(),
                     User = user
                 };
+
+                await _blog.NewPost(newPost).ConfigureAwait(false);
+
+                return RedirectToAction(nameof(PostController.Entry), new { id = newPost.Url });
             }
 
             return View(model);
@@ -119,6 +138,33 @@ namespace AS.Blog.Core.Controllers
             }
 
             var post = await _blog.GetPost(postUrl).ConfigureAwait(false);
+
+            if (post == null)
+            {
+                return (Either<IActionResult, Post>)NotFound();
+            }
+
+            if (Clock.Now.DateTimeUtc < post.PublishDate || post.Deleted)
+            {
+                var permissions = new List<string>
+                {
+                    nameof(PoliciesEnum.Administrator),
+                    nameof(PoliciesEnum.Post)
+                };
+
+                if (!User.Claims.Any(x => permissions.Contains(x.Value)))
+                {
+                    var user = User.Identity.IsAuthenticated
+                        ? await _user.FindUserByName(User.Identity.Name)
+                            .ConfigureAwait(false)
+                        : new User();
+
+                    if (post.UserId != user.UserId)
+                    {
+                        return (Either<IActionResult, Post>)NotFound();
+                    }
+                }
+            }
 
             return post == null
                 ? (Either<IActionResult, Post>)NotFound()

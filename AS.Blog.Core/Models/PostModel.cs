@@ -9,11 +9,15 @@ namespace AS.Blog.Core.Models
         public string Subject { get; set; }
 
         [Required]
+        [DataType(DataType.MultilineText)]
         [Display(Name = "Content", Description = "Content of new post")]
         public string Content { get; set; }
 
         [Required]
         [MinLength(4, ErrorMessage = "Url for post is too short")]
-        public string Url { get; internal set; }
+        public string Url { get; set; }
+
+        [Display(Name = "Tags")]
+        public string Tags { get; set; }
     }
 }
